@@ -9,6 +9,8 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import org.w3c.dom.Text;
+
 import de.greenrobot.event.EventBus;
 import hu.ait.android.maggie.weatherreport.data.WeatherResult;
 
@@ -16,15 +18,23 @@ import hu.ait.android.maggie.weatherreport.data.WeatherResult;
 public class MainActivity extends ActionBarActivity {
 
     private static final String URL_BASE = "http://api.openweathermap.org/data/2.5/weather?q=";
+    private static final String CELSIUS_LABEL = "°C";
+    private static final String FAHRENHEIT_LABEL = "°F";
 
-    private TextView resultsText;
+    private TextView currentTempText;
+    private TextView loTempText;
+    private TextView highTempText;
+    private TextView humidityText;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        resultsText = (TextView) findViewById(R.id.resultsText);
+        currentTempText = (TextView) findViewById(R.id.currentTempText);
+        loTempText = (TextView) findViewById(R.id.loTempText);
+        highTempText = (TextView) findViewById(R.id.highTempText);
+        humidityText = (TextView) findViewById(R.id.humidityText);
 
         final EditText cityEdit = (EditText) findViewById(R.id.cityEdit);
 
@@ -32,7 +42,7 @@ public class MainActivity extends ActionBarActivity {
         getWeatherBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String query = URL_BASE + cityEdit.getText().toString() + ",uk&units=metric";
+                String query = URL_BASE + cityEdit.getText().toString() + "&units=metric";
 
                 new HttpGetTask(getApplicationContext()).execute(query);
             }
@@ -52,7 +62,10 @@ public class MainActivity extends ActionBarActivity {
     }
 
     public void onEventMainThread(WeatherResult result){
-        resultsText.setText("Temperature: " + result.getMain().getTemp());
+        currentTempText.setText(result.getMain().getTemp() + CELSIUS_LABEL);
+        loTempText.setText("Lo: " + result.getMain().getTempMin() + CELSIUS_LABEL);
+        highTempText.setText("Hi: " + result.getMain().getTempMax() + CELSIUS_LABEL);
+        humidityText.setText("Humidity: " + result.getMain().getHumidity() + "%");
     }
 
     @Override
